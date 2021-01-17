@@ -1,6 +1,8 @@
 const path = require('path') //здесь создаем переменную из стандартного пакета node
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // Плагин для копирования файлов из src в dist. Например фавиконку
 const HTMLWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require("copy-webpack-plugin")
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
     context: path.resolve(__dirname, 'src'), // здесь пишем папку с исхдниками, чтобы постоянно не писать к ней путь. Т.е. это как бы будет текущий контекст.
@@ -10,10 +12,28 @@ module.exports = {
         filename: 'bundle.[hash].js', //Это имя файла, [hash] нужен, чтобы избежать проблем с кэшированием. Теперь к имени выходного файла будут добавляться цифры из хэша и он будет уникальным.
         path: path.resolve(__dirname, 'dist') //метод path.resolve вернет нам абсолютный путь к выходному файлу
     },
+    resolve: {
+        extentions: ['.js'],
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+            '@core': path.resolve(__dirname, 'src/core')
+
+        }
+    },
     plugins: [
         new CleanWebpackPlugin(),
         new HTMLWebpackPlugin({
             template: 'index.html'
-        })
+        }),
+        new CopyPlugin({
+            patterns: [
+              { 
+                from: path.resolve(__dirname, 'src/favicon.ico'), 
+                to: path.resolve(__dirname, 'dist') }
+            ],
+          }),
+          new MiniCssExtractPlugin({
+              filename: 'bundle.[hash].css'
+          })
     ]
 }
